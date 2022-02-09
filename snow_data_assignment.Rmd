@@ -239,20 +239,21 @@ Hint: https://ggplot2.tidyverse.org/reference/print.ggplot.html
 
 ```{r}
 fd_monthly_temp <- forcing_data %>%
+  filter(year %in%(2005:2010)) %>%
   group_by(month, year, site) %>%
   summarize(mean_temp=mean(air.temp..K.))
-years <- list(seq(2005,2010,by=1))
-#ggplot(fd_monthly_temp, aes(x=month, y=mean_temp, color=site)) +
-#  geom_line()
 
-for(year in years){
-  print(ggplot(fd_monthly_temp, aes(x=month, y=mean_temp, color=site, year=years)) +  
+plotting_fun <- function(data, i, j){
+  for(i in j){
+    print(ggplot(data, aes(x=month, y=mean_temp, color=site)) +  
     geom_line() + 
+    facet_wrap(~year) +
     scale_x_continuous(breaks=seq(1,12,by=1)) + 
     xlab("Month") + ylab("Mean Temperature (K)") + 
     ggtitle("SASP & SBSP Monthly Temperature"))
+  }
 }
-
+plotting_fun(fd_monthly_temp, year, fd_monthly_temp)
 ```
 
 Bonus: Make a plot of average daily precipitation by day of year (averaged across all available years). Color each site. 
@@ -274,14 +275,26 @@ ggplot(fd_daily_ppt,aes(x=DoY,y=mean_ppt,color=site)) +
 Bonus #2: Use a function and for loop to create yearly plots of precipitation by day of year. Color each site.
 ```{r}
 fd_daily_ppt2 <- forcing_data %>%
+  filter(year %in%(2005:2010)) %>%
   group_by(DoY, year, site) %>%
   summarize(mean_ppt=mean(precip..kg.m.2.s.1.))
-days <- list(seq(1,365,by=1))
+#days <- list(seq(1,365,by=1))
 
-for(day in days){
-  print(ggplot(fd_daily_ppt2, aes(x=DoY, y=mean_ppt, color=site, day=days)) +  
-    geom_line() + 
-    xlab("Day-of-Year") + ylab("Mean Daily Precipitation (kg/m2/s)") + 
+plotting_fun2 <- function(data, i, j){
+  for(i in j){
+    print(ggplot(data, aes(x=DoY, y=mean_ppt, color=site)) +
+    geom_point() + 
+    facet_wrap(~year) +
+    xlab("Day-of-Year") + ylab("Mean Precipitation (kg/m2/s)") + 
     ggtitle("SASP & SBSP Daily Average Precipitation"))
+  }
 }
+plotting_fun2(fd_daily_ppt2, year, fd_daily_ppt2)
+
+#for(day in days){
+#  print(ggplot(fd_daily_ppt2, aes(x=DoY, y=mean_ppt, color=site, day=days)) +  
+#    geom_point() + 
+#    xlab("Day-of-Year") + ylab("Mean Daily Precipitation (kg/m2/s)") + 
+#    ggtitle("SASP & SBSP Daily Average Precipitation"))
+#}
 ```
