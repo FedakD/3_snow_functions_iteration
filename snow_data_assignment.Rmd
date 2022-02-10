@@ -269,7 +269,7 @@ for(yr in 2005:2010){
 }
 ```
 
-At no point between 2005-2010 is Senator Beck warmer than Snow Angel on a monthly average temperature level.
+Answer: At no point between 2005-2010 is Senator Beck warmer than Snow Angel on a monthly average temperature level.
 
 
 Bonus: Make a plot of average daily precipitation by day of year (averaged across all available years). Color each site. 
