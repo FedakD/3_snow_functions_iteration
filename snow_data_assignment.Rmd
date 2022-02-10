@@ -243,18 +243,34 @@ fd_monthly_temp <- forcing_data %>%
   group_by(month, year, site) %>%
   summarize(mean_temp=mean(air.temp..K.))
 
-plotting_fun <- function(data, i, j){
-  for(i in j){
-    print(ggplot(data, aes(x=month, y=mean_temp, color=site)) +  
-    geom_line() + 
-    facet_wrap(~year) +
-    scale_x_continuous(breaks=seq(1,12,by=1)) + 
-    xlab("Month") + ylab("Mean Temperature (K)") + 
-    ggtitle("SASP & SBSP Monthly Temperature"))
-  }
+#Keeping this version since the facet wrap is a good example, but it then creates 6 facet-wrapped plots due to the for loop
+#plotting_fun <- function(data, i, j){
+#  for(i in j){
+#    print(ggplot(data, aes(x=month, y=mean_temp, color=site)) +  
+#    geom_line() + 
+#    facet_wrap(~year) +
+#    scale_x_continuous(breaks=seq(1,12,by=1)) + 
+#    xlab("Month") + ylab("Mean Temperature (K)") + 
+#    ggtitle("SASP & SBSP Monthly Temperature"))
+#  }
+#}
+#plotting_fun(fd_monthly_temp, year, fd_monthly_temp)
+
+temp_plot_fun <- function(data, yr){
+  yr_data <- data[which(data$year==yr),]
+  print(ggplot(yr_data, aes(x=month, y=mean_temp, color=site)) +
+  geom_line() +
+  scale_x_continuous(breaks=seq(1,12,by=1)) +
+  xlab("Month") + ylab("Mean Temperature (K)") +
+  ggtitle(as.character(yr)))
 }
-plotting_fun(fd_monthly_temp, year, fd_monthly_temp)
+for(yr in 2005:2010){
+  temp_plot_fun(fd_monthly_temp, yr)
+}
 ```
+
+At no point between 2005-2010 is Senator Beck warmer than Snow Angel on a monthly average temperature level.
+
 
 Bonus: Make a plot of average daily precipitation by day of year (averaged across all available years). Color each site. 
 ```{r}
@@ -263,12 +279,12 @@ forcing_data$DoY <- yday(forcing_data$Date)
 
 fd_daily_ppt <- forcing_data %>%
   group_by(DoY, site) %>%
-  summarize(mean_ppt=mean(precip..kg.m.2.s.1.))
+  summarize(mean_ppt=mean(precip..kg.m.2.s.1.)*86400)
 
 ggplot(fd_daily_ppt,aes(x=DoY,y=mean_ppt,color=site)) + 
   geom_point() +
   #scale_x_continuous(breaks=seq(1,365,by=30)) +
-  xlab("Day-of-Year") + ylab("Mean Daily Precipitation (kg/m2/s)") +
+  xlab("Day-of-Year") + ylab("Mean Daily Precipitation (kg/m2)") +
   ggtitle("SASP & SBSP Daily Average Precipitation (2003-11)")
 ```
 
@@ -277,24 +293,17 @@ Bonus #2: Use a function and for loop to create yearly plots of precipitation by
 fd_daily_ppt2 <- forcing_data %>%
   filter(year %in%(2005:2010)) %>%
   group_by(DoY, year, site) %>%
-  summarize(mean_ppt=mean(precip..kg.m.2.s.1.))
-#days <- list(seq(1,365,by=1))
+  summarize(mean_ppt=mean(precip..kg.m.2.s.1.)*86400)
 
-plotting_fun2 <- function(data, i, j){
-  for(i in j){
-    print(ggplot(data, aes(x=DoY, y=mean_ppt, color=site)) +
-    geom_point() + 
-    facet_wrap(~year) +
-    xlab("Day-of-Year") + ylab("Mean Precipitation (kg/m2/s)") + 
-    ggtitle("SASP & SBSP Daily Average Precipitation"))
-  }
+ppt_plot_fun <- function(data, yr){
+  yr_data <- data[which(data$year==yr),]
+  print(ggplot(yr_data, aes(x=DoY, y=mean_ppt, color=site)) +
+  geom_point() +
+  xlab("Day-of-Year") + ylab("Mean Precipitation (kg/m2)") +
+  ggtitle(as.character(yr)))
 }
-plotting_fun2(fd_daily_ppt2, year, fd_daily_ppt2)
 
-#for(day in days){
-#  print(ggplot(fd_daily_ppt2, aes(x=DoY, y=mean_ppt, color=site, day=days)) +  
-#    geom_point() + 
-#    xlab("Day-of-Year") + ylab("Mean Daily Precipitation (kg/m2/s)") + 
-#    ggtitle("SASP & SBSP Daily Average Precipitation"))
-#}
+for(yr in 2005:2010){
+  ppt_plot_fun(fd_daily_ppt2, yr)
+}
 ```
